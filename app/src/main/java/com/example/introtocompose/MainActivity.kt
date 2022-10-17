@@ -28,7 +28,6 @@ class MainActivity : ComponentActivity() {
                         Greeting("Android")
                         ShowAge(age = 20)
                     }
-
                 }
             }
         }
