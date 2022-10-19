@@ -2,7 +2,7 @@ package com.example.movieapp.navigation
 
 import java.lang.IllegalArgumentException
 
-//www.google.com/sing_in
+//www.google.com/sign_in
 enum class MovieScreens {
     HomeScreen,
     DetailScreen;
