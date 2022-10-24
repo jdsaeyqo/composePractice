@@ -2,6 +2,7 @@ package com.example.noteapp.screen
 
 
 import android.os.Build
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -18,6 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -42,6 +44,8 @@ fun NoteScreen(
     var description by remember {
         mutableStateOf("")
     }
+
+    val context = LocalContext.current
 
     Column(modifier = Modifier.padding(6.dp)) {
         TopAppBar(title = {
@@ -78,8 +82,10 @@ fun NoteScreen(
             SaveButton(text = "Save", onClick = {
                 if (title.isNotEmpty() && description.isNotEmpty()) {
                     //save, add to List
+                    onAddNote(Note(title = title, description = description))
                     title = ""
                     description = ""
+                    Toast.makeText(context, "Note Added", Toast.LENGTH_SHORT).show()
 
                 }
             })
@@ -89,7 +95,9 @@ fun NoteScreen(
         Divider(modifier = Modifier.padding(10.dp))
         LazyColumn {
             items(notes) { note ->
-                NoteRow(note = note, onNoteClick = {})
+                NoteRow(note = note, onNoteClick = {
+                    onRemoveNote(note)
+                })
             }
         }
 
@@ -113,7 +121,7 @@ fun NoteRow(
     ) {
         Column(
             modifier
-                .clickable { }
+                .clickable { onNoteClick(note)}
                 .padding(horizontal = 14.dp, vertical = 6.dp),
             horizontalAlignment = Alignment.Start) {
             Text(text = note.title, style = MaterialTheme.typography.subtitle2)
