@@ -28,6 +28,7 @@ import com.example.noteapp.components.NoteInputText
 import com.example.noteapp.components.SaveButton
 import com.example.noteapp.data.NotesDataSource
 import com.example.noteapp.model.Note
+import com.example.noteapp.util.formatDate
 import java.time.format.DateTimeFormatter
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -121,13 +122,13 @@ fun NoteRow(
     ) {
         Column(
             modifier
-                .clickable { onNoteClick(note)}
+                .clickable { onNoteClick(note) }
                 .padding(horizontal = 14.dp, vertical = 6.dp),
             horizontalAlignment = Alignment.Start) {
             Text(text = note.title, style = MaterialTheme.typography.subtitle2)
             Text(text = note.description, style = MaterialTheme.typography.subtitle1)
             Text(
-                text = note.entryDate.format(DateTimeFormatter.ofPattern("EEE, d MMM")),
+                text = formatDate(note.entryDate.time),
                 style = MaterialTheme.typography.caption
             )
 
