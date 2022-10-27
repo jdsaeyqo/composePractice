@@ -40,6 +40,11 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun DefaultPreview() {
     TriviaAppTheme {
-
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = MaterialTheme.colors.background
+        ) {
+            TriviaHome()
+        }
     }
 }

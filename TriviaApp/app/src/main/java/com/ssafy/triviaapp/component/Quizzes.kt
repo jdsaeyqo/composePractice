@@ -7,6 +7,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
+import androidx.compose.material.ButtonDefaults.buttonColors
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -18,7 +19,9 @@ import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ssafy.triviaapp.model.QuizListItem
@@ -45,6 +48,8 @@ fun Quizzes(quizViewModel: QuizViewModel) {
             null
         }
 
+        Log.d("Quizzes", "Quizzes: ${questionIndex.value}")
+        Log.d("Quizzes", "Quizzes: $quiz")
         if (quizzes != null) {
             QuizDisplay(
                 question = quiz!!,
@@ -68,18 +73,21 @@ fun QuizDisplay(
     viewModel: QuizViewModel,
     onNextClicked: (Int) -> Unit
 ) {
-    val choicesState by remember {
+
+
+    val choicesState by remember(question) {
         mutableStateOf(question.choices.toMutableList())
     }
-
-    var answerState by remember {
+    Log.d("Quizzes", "QuizDisplay: ${question}")
+    Log.d("Quizzes", "QuizDisplay: ${choicesState}")
+    var answerState by remember(question) {
         mutableStateOf<Int?>(null)
     }
 
-    var correctAnswerState by remember {
+    var correctAnswerState by remember(question) {
         mutableStateOf<Boolean?>(null)
     }
-    val updateAnswer: (Int) -> Unit = remember {
+    val updateAnswer: (Int) -> Unit = remember(question) {
         {
             answerState = it
             correctAnswerState = choicesState[it] == question.answer
@@ -98,7 +106,11 @@ fun QuizDisplay(
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.Start
         ) {
-            QuizTracker(counter = questionIndex.value + 1 , outOf)
+
+            if (questionIndex.value >= 3) {
+                ShowProgress(score = questionIndex.value)
+            }
+            QuizTracker(counter = questionIndex.value + 1, outOf)
             DrawDottedLine(pathEffect)
 
             Column {
@@ -115,6 +127,7 @@ fun QuizDisplay(
                 )
 
                 //choices
+                Log.d("QuizDisplay", "QuizDisplay: $choicesState")
                 choicesState.forEachIndexed { index, answerText ->
                     Row(
                         modifier = Modifier
@@ -226,4 +239,60 @@ fun QuizTracker(counter: Int, outOf: Int) {
 
     }, modifier = Modifier.padding(20.dp))
 
+}
+
+@Preview
+@Composable
+fun ShowProgress(score: Int = 12) {
+    val gradient = Brush.linearGradient(listOf(Color(0xfff95075), Color(0xffbe6be5)))
+
+    val progressFactor by remember(score) {
+        mutableStateOf(score * 0.005f)
+    }
+    Row(
+        modifier = Modifier
+            .padding(3.dp)
+            .fillMaxWidth()
+            .height(45.dp)
+            .border(
+                width = 4.dp, brush = Brush.linearGradient(
+                    colors = listOf(
+
+                        AppColors.mLightPurple, AppColors.mLightPurple
+                    )
+                ), shape = RoundedCornerShape(34.dp)
+            )
+            .clip(
+                RoundedCornerShape(
+                    topStartPercent = 50,
+                    topEndPercent = 50,
+                    bottomEndPercent = 50,
+                    bottomStartPercent = 50
+                )
+            )
+            .background(Color.Transparent), verticalAlignment = Alignment.CenterVertically
+    ) {
+        Button(
+            contentPadding = PaddingValues(1.dp), onClick = { },
+            modifier = Modifier
+                .fillMaxWidth(progressFactor)
+                .background(
+                    brush = gradient
+                ),
+            enabled = false,
+            elevation = null,
+            colors = buttonColors(
+                backgroundColor = Color.Transparent,
+                disabledBackgroundColor = Color.Transparent
+            )
+        ) {
+            Text(text = (score*10).toString(),
+                modifier = Modifier.clip(shape = RoundedCornerShape(23.dp))
+                    .fillMaxHeight(0.87f)
+                    .fillMaxWidth()
+                    .padding(6.dp),
+                color = AppColors.mOffWhite,
+                textAlign = TextAlign.Center)
+        }
+    }
 }
